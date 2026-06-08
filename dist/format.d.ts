@@ -26,4 +26,4 @@ export declare function formatRupiah(value: number | string | null | undefined, 
  * E.g., "Rp. 100.000" -> 100000
  * E.g., "Rp. 100.000,50" -> 100000.5
  */
-export declare function parseRupiah(value: string | number | null | undefined): number;
+export declare function parseRupiah(value: string | number | null | undefined, options?: FormatOptions): number;

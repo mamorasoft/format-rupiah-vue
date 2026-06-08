@@ -71,7 +71,7 @@ export function formatRupiah(value: number | string | null | undefined, options?
  * E.g., "Rp. 100.000" -> 100000
  * E.g., "Rp. 100.000,50" -> 100000.5
  */
-export function parseRupiah(value: string | number | null | undefined): number {
+export function parseRupiah(value: string | number | null | undefined, options?: FormatOptions): number {
   if (value === null || value === undefined || value === '') {
     return 0;
   }
@@ -79,6 +79,8 @@ export function parseRupiah(value: string | number | null | undefined): number {
   if (typeof value === 'number') {
     return value;
   }
+
+  const opts = { ...DEFAULT_OPTIONS, ...options };
 
   // Convert to string and clean
   let str = value.toString().trim();
@@ -92,60 +94,37 @@ export function parseRupiah(value: string | number | null | undefined): number {
   // Remove currency prefix symbols (e.g. "Rp.", "Rp ", "IDR ")
   str = str.replace(/^[a-zA-Z\s]+[.,]?\s*/, '');
 
-  // Remove everything except digits, comma, and period
-  // We need to determine which is the decimal separator.
-  // Standard IDR: thousand is '.', decimal is ','
-  // However, sometimes users might type '.' as decimal or ',' as thousand.
-  // Let's assume standard: '.' is thousand, ',' is decimal.
-  // We strip all characters except digits, and the last separator if it represents decimals.
-
-  // Let's check the position of ',' and '.' to see which is decimal.
-  // If there's a comma after the last dot, or if there is only a comma and it's near the end,
-  // we treat comma as the decimal separator.
-
-  // A robust way to clean thousand separators:
-  // If comma exists, and dot exists:
-  // If dot is before comma, dot is thousand separator, comma is decimal.
-  // If comma is before dot, comma is thousand, dot is decimal (e.g. English format).
-
   let cleanStr = str;
-  const lastDot = cleanStr.lastIndexOf('.');
-  const lastComma = cleanStr.lastIndexOf(',');
 
-  if (lastDot !== -1 && lastComma !== -1) {
-    if (lastDot < lastComma) {
-      // Standard IDR format: 1.000.000,50
-      // Remove all dots, replace comma with dot
-      cleanStr = cleanStr.replace(/\./g, '').replace(/,/g, '.');
-    } else {
-      // English format: 1,000,000.50
-      // Remove all commas, keep dot
-      cleanStr = cleanStr.replace(/,/g, '');
+  let thousandSep = opts.thousandSeparator;
+  let decimalSep = opts.decimalSeparator;
+
+  // Auto-detect standard programming decimal notation (e.g. "12500.50" or "100.5")
+  // ONLY if the original string does not contain currency prefix symbols (letters)
+  const hasCurrencyPrefix = /[a-zA-Z]/.test(value.toString());
+  if (!hasCurrencyPrefix && decimalSep === ',' && !str.includes(',')) {
+    const dotIndex = str.lastIndexOf('.');
+    if (dotIndex !== -1) {
+      const charsAfter = str.length - 1 - dotIndex;
+      if (charsAfter === 1 || charsAfter === 2) {
+        decimalSep = '.';
+        thousandSep = ',';
+      }
     }
-  } else if (lastComma !== -1) {
-    // Only comma exists. Could be decimal (e.g. 100,50) or thousand (100,000)
-    // If it is followed by exactly 2 or 1 digits at the very end, it's likely decimal.
-    // Otherwise, if it is followed by 3 digits, let's see. In Indonesia, form input Rp 100,000 is often meant as 100000 (thousand).
-    // Let's check if the remaining characters after lastComma length is not 3, then it is a decimal separator.
-    const charsAfter = cleanStr.length - 1 - lastComma;
-    if (charsAfter === 3) {
-      // Treat as thousand separator
-      cleanStr = cleanStr.replace(/,/g, '');
-    } else {
-      // Treat as decimal separator
-      cleanStr = cleanStr.replace(/,/g, '.');
-    }
-  } else if (lastDot !== -1) {
-    // Only dot exists. Could be thousand (1.000.000) or decimal (100.5)
-    // If it is followed by 3 or more digits, it's a thousand separator.
-    // If it's near the end (1 or 2 digits), it's a decimal separator.
-    const charsAfter = cleanStr.length - 1 - lastDot;
-    if (charsAfter >= 3) {
-      // Treat as thousand separator
-      cleanStr = cleanStr.replace(/\./g, '');
-    } else {
-      // Treat as decimal separator, keep dot
-    }
+  }
+
+  // Escape separators for regex
+  const thousandEscaped = thousandSep.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const decimalEscaped = decimalSep.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+  // Remove thousand separators
+  const thousandRegex = new RegExp(thousandEscaped, 'g');
+  cleanStr = cleanStr.replace(thousandRegex, '');
+
+  // Replace decimal separator with standard dot for parseFloat
+  if (decimalSep !== '.') {
+    const decimalRegex = new RegExp(decimalEscaped, 'g');
+    cleanStr = cleanStr.replace(decimalRegex, '.');
   }
 
   // Remove all non-numeric and non-dot characters
