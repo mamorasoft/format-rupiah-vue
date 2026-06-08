@@ -17,27 +17,16 @@ export const vRupiah: ObjectDirective<HTMLElement, FormatOptions | undefined> = 
     }
 
     const rupiahEl = inputEl as RupiahInputElement;
-    
-    // Determine if binding value is the nominal value or options object
-    const bindingVal = binding.value;
-    const hasBinding = bindingVal !== undefined;
-    const isPrimitive = hasBinding && (typeof bindingVal === 'number' || typeof bindingVal === 'string' || bindingVal === null);
+    rupiahEl._rupiahOptions = typeof binding.value === 'object' && binding.value !== null ? binding.value : undefined;
 
-    if (hasBinding && !isPrimitive && typeof bindingVal === 'object') {
-      rupiahEl._rupiahOptions = bindingVal;
-    }
-
-    // Format initial value if exists after Vue completes mounting
-    setTimeout(() => {
-      const initialRaw = isPrimitive ? bindingVal : rupiahEl.value;
-      if (initialRaw !== null && initialRaw !== undefined && initialRaw !== '') {
-        const formatted = formatRupiah(initialRaw, rupiahEl._rupiahOptions);
-        if (rupiahEl.value !== formatted) {
-          rupiahEl.value = formatted;
-          rupiahEl.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+    // Format initial value if exists
+    if (rupiahEl.value) {
+      const formatted = formatRupiah(rupiahEl.value, rupiahEl._rupiahOptions);
+      if (rupiahEl.value !== formatted) {
+        rupiahEl.value = formatted;
+        rupiahEl.dispatchEvent(new Event('input', { bubbles: true }));
       }
-    }, 0);
+    }
 
     // Input listener to format value dynamically on typing
     const listener = (event: Event) => {
@@ -81,20 +70,10 @@ export const vRupiah: ObjectDirective<HTMLElement, FormatOptions | undefined> = 
     if (!inputEl) return;
 
     const rupiahEl = inputEl as RupiahInputElement;
-    
-    // Determine if binding value is the nominal value or options object
-    const bindingVal = binding.value;
-    const hasBinding = bindingVal !== undefined;
-    const isPrimitive = hasBinding && (typeof bindingVal === 'number' || typeof bindingVal === 'string' || bindingVal === null);
+    rupiahEl._rupiahOptions = typeof binding.value === 'object' && binding.value !== null ? binding.value : undefined;
 
-    if (hasBinding && !isPrimitive && typeof bindingVal === 'object') {
-      rupiahEl._rupiahOptions = bindingVal;
-    }
-
-    const rawValue = isPrimitive ? bindingVal : rupiahEl.value;
-    const currentParsed = parseRupiah(rawValue);
-
-    // If the binding value changes directly from outside, update the formatted string
+    // Re-format whenever the DOM value doesn't match the formatted representation
+    const currentParsed = parseRupiah(rupiahEl.value);
     const formatted = formatRupiah(currentParsed, rupiahEl._rupiahOptions);
     if (rupiahEl.value !== formatted) {
       rupiahEl.value = formatted;
