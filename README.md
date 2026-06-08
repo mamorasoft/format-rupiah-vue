@@ -158,3 +158,9 @@ console.log(parseRupiah('100.000')); // 100000
 ## License
 
 MIT License
+
+---
+
+## Creator
+
+- [alfin-dev](https://github.com/alfin-dev)
