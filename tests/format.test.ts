@@ -39,10 +39,10 @@ describe('formatRupiah', () => {
   });
 
   it('should support custom separators', () => {
-    expect(formatRupiah(100000.5, { 
-      decimalPlaces: 1, 
-      thousandSeparator: ',', 
-      decimalSeparator: '.' 
+    expect(formatRupiah(100000.5, {
+      decimalPlaces: 1,
+      thousandSeparator: ',',
+      decimalSeparator: '.'
     })).toBe('Rp. 100,000.5');
   });
 });

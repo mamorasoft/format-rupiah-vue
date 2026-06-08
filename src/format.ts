@@ -47,7 +47,7 @@ export function formatRupiah(value: number | string | null | undefined, options?
   // Round to specified decimal places
   const fixedNum = num.toFixed(opts.decimalPlaces);
   const parts = fixedNum.split('.');
-  
+
   let integerPart = parts[0];
   const decimalPart = parts[1] || '';
 
@@ -98,16 +98,16 @@ export function parseRupiah(value: string | number | null | undefined): number {
   // However, sometimes users might type '.' as decimal or ',' as thousand.
   // Let's assume standard: '.' is thousand, ',' is decimal.
   // We strip all characters except digits, and the last separator if it represents decimals.
-  
+
   // Let's check the position of ',' and '.' to see which is decimal.
   // If there's a comma after the last dot, or if there is only a comma and it's near the end,
   // we treat comma as the decimal separator.
-  
+
   // A robust way to clean thousand separators:
   // If comma exists, and dot exists:
   // If dot is before comma, dot is thousand separator, comma is decimal.
   // If comma is before dot, comma is thousand, dot is decimal (e.g. English format).
-  
+
   let cleanStr = str;
   const lastDot = cleanStr.lastIndexOf('.');
   const lastComma = cleanStr.lastIndexOf(',');
@@ -137,10 +137,10 @@ export function parseRupiah(value: string | number | null | undefined): number {
     }
   } else if (lastDot !== -1) {
     // Only dot exists. Could be thousand (1.000.000) or decimal (100.5)
-    // If it is followed by exactly 3 digits, and there's more digits before, it's likely thousand.
-    // If it's near the end (1 or 2 digits), it's likely decimal.
+    // If it is followed by 3 or more digits, it's a thousand separator.
+    // If it's near the end (1 or 2 digits), it's a decimal separator.
     const charsAfter = cleanStr.length - 1 - lastDot;
-    if (charsAfter === 3) {
+    if (charsAfter >= 3) {
       // Treat as thousand separator
       cleanStr = cleanStr.replace(/\./g, '');
     } else {

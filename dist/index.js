@@ -32,7 +32,7 @@ function o(t) {
   r = r.replace(/-/g, ""), r = r.replace(/^[a-zA-Z\s]+[.,]?\s*/, "");
   let e = r;
   const a = e.lastIndexOf("."), u = e.lastIndexOf(",");
-  a !== -1 && u !== -1 ? a < u ? e = e.replace(/\./g, "").replace(/,/g, ".") : e = e.replace(/,/g, "") : u !== -1 ? e.length - 1 - u === 3 ? e = e.replace(/,/g, "") : e = e.replace(/,/g, ".") : a !== -1 && e.length - 1 - a === 3 && (e = e.replace(/\./g, "")), e = e.replace(/[^0-9.]/g, "");
+  a !== -1 && u !== -1 ? a < u ? e = e.replace(/\./g, "").replace(/,/g, ".") : e = e.replace(/,/g, "") : u !== -1 ? e.length - 1 - u === 3 ? e = e.replace(/,/g, "") : e = e.replace(/,/g, ".") : a !== -1 && e.length - 1 - a >= 3 && (e = e.replace(/\./g, "")), e = e.replace(/[^0-9.]/g, "");
   const s = parseFloat(e);
   return isNaN(s) ? 0 : n ? -s : s;
 }
