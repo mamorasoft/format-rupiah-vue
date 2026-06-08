@@ -5,97 +5,98 @@ const E = {
   thousandSeparator: ".",
   decimalSeparator: ","
 };
-function f(t, r) {
+function f(t, a) {
   if (t == null || t === "")
     return "";
-  const n = { ...E, ...r };
-  let e = typeof t == "number" ? t : parseFloat(l(t).toString());
+  const n = { ...E, ...a };
+  let e = typeof t == "number" ? t : parseFloat(p(t).toString());
   if (isNaN(e))
     return "";
-  const a = e < 0;
+  const u = e < 0;
   e = Math.abs(e);
-  const o = e.toFixed(n.decimalPlaces).split(".");
-  let u = o[0];
-  const i = o[1] || "", c = /(\d+)(\d{3})/;
-  for (; c.test(u); )
-    u = u.replace(c, `$1${n.thousandSeparator}$2`);
-  let d = u;
-  return n.decimalPlaces > 0 && i && (d += n.decimalSeparator + i), `${a ? "-" : ""}${n.prefix}${d}`;
+  const s = e.toFixed(n.decimalPlaces).split(".");
+  let o = s[0];
+  const i = s[1] || "", l = /(\d+)(\d{3})/;
+  for (; l.test(o); )
+    o = o.replace(l, `$1${n.thousandSeparator}$2`);
+  let d = o;
+  return n.decimalPlaces > 0 && i && (d += n.decimalSeparator + i), `${u ? "-" : ""}${n.prefix}${d}`;
 }
-function l(t, r) {
+function p(t, a) {
   if (t == null || t === "")
     return 0;
   if (typeof t == "number")
     return t;
-  const n = { ...E, ...r };
+  const n = { ...E, ...a };
   let e = t.toString().trim();
-  const a = e.includes("-");
+  const u = e.includes("-");
   e = e.replace(/-/g, ""), e = e.replace(/^[a-zA-Z\s]+[.,]?\s*/, "");
-  let s = e, o = n.thousandSeparator, u = n.decimalSeparator;
-  if (!/[a-zA-Z]/.test(t.toString()) && u === "," && !e.includes(",")) {
-    const p = e.lastIndexOf(".");
-    if (p !== -1) {
-      const v = e.length - 1 - p;
-      (v === 1 || v === 2) && (u = ".", o = ",");
+  let r = e, s = n.thousandSeparator, o = n.decimalSeparator;
+  if (!/[a-zA-Z]/.test(t.toString()) && o === "," && !e.includes(",")) {
+    const c = e.lastIndexOf(".");
+    if (c !== -1) {
+      const g = e.length - 1 - c;
+      (g === 1 || g === 2) && (o = ".", s = ",");
     }
   }
-  const c = o.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), d = u.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), h = new RegExp(c, "g");
-  if (s = s.replace(h, ""), u !== ".") {
-    const p = new RegExp(d, "g");
-    s = s.replace(p, ".");
+  const l = s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), d = o.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), h = new RegExp(l, "g");
+  if (r = r.replace(h, ""), o !== ".") {
+    const c = new RegExp(d, "g");
+    r = r.replace(c, ".");
   }
-  s = s.replace(/[^0-9.]/g, "");
-  const m = parseFloat(s);
-  return isNaN(m) ? 0 : a ? -m : m;
+  r = r.replace(/[^0-9.]/g, "");
+  const m = parseFloat(r);
+  return isNaN(m) ? 0 : u ? -m : m;
 }
-const g = {
-  mounted(t, r) {
+const v = {
+  mounted(t, a) {
     let n = t instanceof HTMLInputElement ? t : t.querySelector("input");
     if (!n) {
       console.warn("v-rupiah directive requires an input element");
       return;
     }
     const e = n;
-    e._rupiahOptions = r.value, e.value && (e.value = f(e.value, e._rupiahOptions));
-    const a = (s) => {
-      if (s.defaultPrevented) return;
-      const o = e.value, u = l(o), i = f(u, e._rupiahOptions), c = e.selectionStart, d = e.selectionEnd;
-      if (o !== i) {
-        if (e.value = i, c !== null && d !== null) {
-          const h = i.length - o.length, p = c === o.length ? i.length : Math.max(0, c + h);
-          e.setSelectionRange(p, p);
+    if (e._rupiahOptions = a.value, console.log("v-rupiah mounted: initial value =", e.value), e.value) {
+      const r = f(e.value, e._rupiahOptions);
+      console.log("v-rupiah mounted: formatting", e.value, "to", r), e.value !== r && (e.value = r, e.dispatchEvent(new Event("input", { bubbles: !0 })));
+    }
+    const u = (r) => {
+      if (r.defaultPrevented) return;
+      const s = e.value, o = p(s), i = f(o, e._rupiahOptions), l = e.selectionStart, d = e.selectionEnd;
+      if (s !== i) {
+        if (e.value = i, l !== null && d !== null) {
+          const h = i.length - s.length, c = l === s.length ? i.length : Math.max(0, l + h);
+          e.setSelectionRange(c, c);
         }
         e.dispatchEvent(new Event("input", { bubbles: !0 }));
       }
     };
-    e._rupiahInputListener = a, e.addEventListener("input", a);
+    e._rupiahInputListener = u, e.addEventListener("input", u);
   },
-  updated(t, r) {
+  updated(t, a) {
     let n = t instanceof HTMLInputElement ? t : t.querySelector("input");
     if (!n) return;
     const e = n;
-    e._rupiahOptions = r.value;
-    const a = l(e.value);
-    typeof r.value == "object" || l(r.value);
-    const s = f(a, e._rupiahOptions);
-    e.value !== s && (e.value = s);
+    e._rupiahOptions = a.value, console.log("v-rupiah updated: value =", e.value);
+    const u = p(e.value), r = f(u, e._rupiahOptions);
+    console.log("v-rupiah updated: currentParsed =", u, "formatted =", r), e.value !== r && (e.value = r, e.dispatchEvent(new Event("input", { bubbles: !0 })));
   },
   unmounted(t) {
-    let r = t instanceof HTMLInputElement ? t : t.querySelector("input");
-    if (!r) return;
-    const n = r;
+    let a = t instanceof HTMLInputElement ? t : t.querySelector("input");
+    if (!a) return;
+    const n = a;
     n._rupiahInputListener && (n.removeEventListener("input", n._rupiahInputListener), delete n._rupiahInputListener), delete n._rupiahOptions;
   }
 };
-function R(t = 0, r) {
+function R(t = 0, a) {
   const n = S(
-    typeof t == "number" ? t : l(t)
+    typeof t == "number" ? t : p(t)
   ), e = x({
     get() {
-      return f(n.value, r);
+      return f(n.value, a);
     },
-    set(a) {
-      n.value = l(a);
+    set(u) {
+      n.value = p(u);
     }
   });
   return {
@@ -110,34 +111,34 @@ function R(t = 0, r) {
     /**
      * Helper to format any value using the same options.
      */
-    format: (a) => f(a, r),
+    format: (u) => f(u, a),
     /**
      * Helper to parse any formatted string into a number.
      */
-    parse: l
+    parse: p
   };
 }
 const $ = {
-  install(t, r) {
+  install(t, a) {
     t.directive("rupiah", {
       mounted(n, e) {
-        const a = { ...r, ...e.value };
-        g.mounted(n, { ...e, value: a }, e.instance, null);
+        const u = { ...a, ...e.value };
+        v.mounted(n, { ...e, value: u }, e.instance, null);
       },
       updated(n, e) {
-        const a = { ...r, ...e.value };
-        g.updated(n, { ...e, value: a }, e.instance, null);
+        const u = { ...a, ...e.value };
+        v.updated(n, { ...e, value: u }, e.instance, null);
       },
       unmounted(n, e) {
-        g.unmounted(n, e, e.instance, null);
+        v.unmounted(n, e, e.instance, null);
       }
-    }), t.config.globalProperties.$formatRupiah = (n, e) => f(n, { ...r, ...e }), t.config.globalProperties.$parseRupiah = l;
+    }), t.config.globalProperties.$formatRupiah = (n, e) => f(n, { ...a, ...e }), t.config.globalProperties.$parseRupiah = p;
   }
 };
 export {
   $ as default,
   f as formatRupiah,
-  l as parseRupiah,
+  p as parseRupiah,
   R as useRupiah,
-  g as vRupiah
+  v as vRupiah
 };

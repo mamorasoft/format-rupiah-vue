@@ -21,7 +21,11 @@ export const vRupiah: ObjectDirective<HTMLElement, FormatOptions | undefined> = 
 
     // Format initial value if exists
     if (rupiahEl.value) {
-      rupiahEl.value = formatRupiah(rupiahEl.value, rupiahEl._rupiahOptions);
+      const formatted = formatRupiah(rupiahEl.value, rupiahEl._rupiahOptions);
+      if (rupiahEl.value !== formatted) {
+        rupiahEl.value = formatted;
+        rupiahEl.dispatchEvent(new Event('input', { bubbles: true }));
+      }
     }
 
     // Input listener to format value dynamically on typing
@@ -43,7 +47,7 @@ export const vRupiah: ObjectDirective<HTMLElement, FormatOptions | undefined> = 
         // Restore cursor position with adjustment for added/removed characters
         if (selectionStart !== null && selectionEnd !== null) {
           const diff = formatted.length - rawValue.length;
-          
+
           // Basic heuristic: if caret was at the end, keep it at the end.
           // Otherwise, adjust by the length difference.
           const isAtEnd = selectionStart === rawValue.length;
@@ -70,12 +74,12 @@ export const vRupiah: ObjectDirective<HTMLElement, FormatOptions | undefined> = 
 
     // Only update if the value has actually changed when parsed
     const currentParsed = parseRupiah(rupiahEl.value);
-    const bindingParsed = typeof binding.value === 'object' ? currentParsed : parseRupiah(binding.value);
 
     // If the binding value changes directly from outside, update the formatted string
     const formatted = formatRupiah(currentParsed, rupiahEl._rupiahOptions);
     if (rupiahEl.value !== formatted) {
       rupiahEl.value = formatted;
+      rupiahEl.dispatchEvent(new Event('input', { bubbles: true }));
     }
   },
 
