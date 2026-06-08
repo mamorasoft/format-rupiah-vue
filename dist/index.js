@@ -1,102 +1,104 @@
 import { ref as S, computed as x } from "vue";
-const E = {
+const g = {
   prefix: "Rp. ",
   decimalPlaces: 0,
   thousandSeparator: ".",
   decimalSeparator: ","
 };
-function f(t, a) {
+function f(t, r) {
   if (t == null || t === "")
     return "";
-  const n = { ...E, ...a };
-  let e = typeof t == "number" ? t : parseFloat(p(t).toString());
+  const n = { ...g, ...r };
+  let e = typeof t == "number" ? t : parseFloat(l(t).toString());
   if (isNaN(e))
     return "";
-  const u = e < 0;
+  const a = e < 0;
   e = Math.abs(e);
-  const s = e.toFixed(n.decimalPlaces).split(".");
-  let o = s[0];
-  const i = s[1] || "", l = /(\d+)(\d{3})/;
-  for (; l.test(o); )
-    o = o.replace(l, `$1${n.thousandSeparator}$2`);
-  let d = o;
-  return n.decimalPlaces > 0 && i && (d += n.decimalSeparator + i), `${u ? "-" : ""}${n.prefix}${d}`;
+  const u = e.toFixed(n.decimalPlaces).split(".");
+  let i = u[0];
+  const o = u[1] || "", c = /(\d+)(\d{3})/;
+  for (; c.test(i); )
+    i = i.replace(c, `$1${n.thousandSeparator}$2`);
+  let d = i;
+  return n.decimalPlaces > 0 && o && (d += n.decimalSeparator + o), `${a ? "-" : ""}${n.prefix}${d}`;
 }
-function p(t, a) {
+function l(t, r) {
   if (t == null || t === "")
     return 0;
   if (typeof t == "number")
     return t;
-  const n = { ...E, ...a };
+  const n = { ...g, ...r };
   let e = t.toString().trim();
-  const u = e.includes("-");
+  const a = e.includes("-");
   e = e.replace(/-/g, ""), e = e.replace(/^[a-zA-Z\s]+[.,]?\s*/, "");
-  let r = e, s = n.thousandSeparator, o = n.decimalSeparator;
-  if (!/[a-zA-Z]/.test(t.toString()) && o === "," && !e.includes(",")) {
-    const c = e.lastIndexOf(".");
-    if (c !== -1) {
-      const g = e.length - 1 - c;
-      (g === 1 || g === 2) && (o = ".", s = ",");
+  let s = e, u = n.thousandSeparator, i = n.decimalSeparator;
+  if (!/[a-zA-Z]/.test(t.toString()) && i === "," && !e.includes(",")) {
+    const p = e.lastIndexOf(".");
+    if (p !== -1) {
+      const v = e.length - 1 - p;
+      (v === 1 || v === 2) && (i = ".", u = ",");
     }
   }
-  const l = s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), d = o.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), h = new RegExp(l, "g");
-  if (r = r.replace(h, ""), o !== ".") {
-    const c = new RegExp(d, "g");
-    r = r.replace(c, ".");
+  const c = u.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), d = i.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), h = new RegExp(c, "g");
+  if (s = s.replace(h, ""), i !== ".") {
+    const p = new RegExp(d, "g");
+    s = s.replace(p, ".");
   }
-  r = r.replace(/[^0-9.]/g, "");
-  const m = parseFloat(r);
-  return isNaN(m) ? 0 : u ? -m : m;
+  s = s.replace(/[^0-9.]/g, "");
+  const m = parseFloat(s);
+  return isNaN(m) ? 0 : a ? -m : m;
 }
-const v = {
-  mounted(t, a) {
+const E = {
+  mounted(t, r) {
     let n = t instanceof HTMLInputElement ? t : t.querySelector("input");
     if (!n) {
       console.warn("v-rupiah directive requires an input element");
       return;
     }
     const e = n;
-    if (e._rupiahOptions = a.value, console.log("v-rupiah mounted: initial value =", e.value), e.value) {
-      const r = f(e.value, e._rupiahOptions);
-      console.log("v-rupiah mounted: formatting", e.value, "to", r), e.value !== r && (e.value = r, e.dispatchEvent(new Event("input", { bubbles: !0 })));
-    }
-    const u = (r) => {
-      if (r.defaultPrevented) return;
-      const s = e.value, o = p(s), i = f(o, e._rupiahOptions), l = e.selectionStart, d = e.selectionEnd;
-      if (s !== i) {
-        if (e.value = i, l !== null && d !== null) {
-          const h = i.length - s.length, c = l === s.length ? i.length : Math.max(0, l + h);
-          e.setSelectionRange(c, c);
+    e._rupiahOptions = r.value, setTimeout(() => {
+      if (e.value) {
+        const s = f(e.value, e._rupiahOptions);
+        e.value !== s && (e.value = s, e.dispatchEvent(new Event("input", { bubbles: !0 })));
+      }
+    }, 0);
+    const a = (s) => {
+      if (s.defaultPrevented) return;
+      const u = e.value, i = l(u), o = f(i, e._rupiahOptions), c = e.selectionStart, d = e.selectionEnd;
+      if (u !== o) {
+        if (e.value = o, c !== null && d !== null) {
+          const h = o.length - u.length, p = c === u.length ? o.length : Math.max(0, c + h);
+          e.setSelectionRange(p, p);
         }
         e.dispatchEvent(new Event("input", { bubbles: !0 }));
       }
     };
-    e._rupiahInputListener = u, e.addEventListener("input", u);
+    e._rupiahInputListener = a, e.addEventListener("input", a);
   },
-  updated(t, a) {
+  updated(t, r) {
     let n = t instanceof HTMLInputElement ? t : t.querySelector("input");
     if (!n) return;
     const e = n;
-    e._rupiahOptions = a.value, console.log("v-rupiah updated: value =", e.value);
-    const u = p(e.value), r = f(u, e._rupiahOptions);
-    console.log("v-rupiah updated: currentParsed =", u, "formatted =", r), e.value !== r && (e.value = r, e.dispatchEvent(new Event("input", { bubbles: !0 })));
+    e._rupiahOptions = r.value;
+    const a = l(e.value), s = f(a, e._rupiahOptions);
+    e.value !== s && (e.value = s, e.dispatchEvent(new Event("input", { bubbles: !0 })));
   },
   unmounted(t) {
-    let a = t instanceof HTMLInputElement ? t : t.querySelector("input");
-    if (!a) return;
-    const n = a;
+    let r = t instanceof HTMLInputElement ? t : t.querySelector("input");
+    if (!r) return;
+    const n = r;
     n._rupiahInputListener && (n.removeEventListener("input", n._rupiahInputListener), delete n._rupiahInputListener), delete n._rupiahOptions;
   }
 };
-function R(t = 0, a) {
+function R(t = 0, r) {
   const n = S(
-    typeof t == "number" ? t : p(t)
+    typeof t == "number" ? t : l(t)
   ), e = x({
     get() {
-      return f(n.value, a);
+      return f(n.value, r);
     },
-    set(u) {
-      n.value = p(u);
+    set(a) {
+      n.value = l(a);
     }
   });
   return {
@@ -111,34 +113,34 @@ function R(t = 0, a) {
     /**
      * Helper to format any value using the same options.
      */
-    format: (u) => f(u, a),
+    format: (a) => f(a, r),
     /**
      * Helper to parse any formatted string into a number.
      */
-    parse: p
+    parse: l
   };
 }
 const $ = {
-  install(t, a) {
+  install(t, r) {
     t.directive("rupiah", {
       mounted(n, e) {
-        const u = { ...a, ...e.value };
-        v.mounted(n, { ...e, value: u }, e.instance, null);
+        const a = { ...r, ...e.value };
+        E.mounted(n, { ...e, value: a }, e.instance, null);
       },
       updated(n, e) {
-        const u = { ...a, ...e.value };
-        v.updated(n, { ...e, value: u }, e.instance, null);
+        const a = { ...r, ...e.value };
+        E.updated(n, { ...e, value: a }, e.instance, null);
       },
       unmounted(n, e) {
-        v.unmounted(n, e, e.instance, null);
+        E.unmounted(n, e, e.instance, null);
       }
-    }), t.config.globalProperties.$formatRupiah = (n, e) => f(n, { ...a, ...e }), t.config.globalProperties.$parseRupiah = p;
+    }), t.config.globalProperties.$formatRupiah = (n, e) => f(n, { ...r, ...e }), t.config.globalProperties.$parseRupiah = l;
   }
 };
 export {
   $ as default,
   f as formatRupiah,
-  p as parseRupiah,
+  l as parseRupiah,
   R as useRupiah,
-  v as vRupiah
+  E as vRupiah
 };

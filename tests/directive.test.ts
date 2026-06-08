@@ -41,7 +41,7 @@ describe('vRupiah Directive', () => {
     });
 
     const root = app.mount(container);
-    await nextTick();
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     const inputEl = container.querySelector('input') as HTMLInputElement;
     expect(inputEl.value).toBe('Rp. 150.000');

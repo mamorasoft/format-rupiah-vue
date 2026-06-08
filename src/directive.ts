@@ -19,14 +19,16 @@ export const vRupiah: ObjectDirective<HTMLElement, FormatOptions | undefined> = 
     const rupiahEl = inputEl as RupiahInputElement;
     rupiahEl._rupiahOptions = binding.value;
 
-    // Format initial value if exists
-    if (rupiahEl.value) {
-      const formatted = formatRupiah(rupiahEl.value, rupiahEl._rupiahOptions);
-      if (rupiahEl.value !== formatted) {
-        rupiahEl.value = formatted;
-        rupiahEl.dispatchEvent(new Event('input', { bubbles: true }));
+    // Format initial value if exists after Vue completes mounting
+    setTimeout(() => {
+      if (rupiahEl.value) {
+        const formatted = formatRupiah(rupiahEl.value, rupiahEl._rupiahOptions);
+        if (rupiahEl.value !== formatted) {
+          rupiahEl.value = formatted;
+          rupiahEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
       }
-    }
+    }, 0);
 
     // Input listener to format value dynamically on typing
     const listener = (event: Event) => {
