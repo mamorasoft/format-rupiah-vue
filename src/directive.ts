@@ -17,12 +17,21 @@ export const vRupiah: ObjectDirective<HTMLElement, FormatOptions | undefined> = 
     }
 
     const rupiahEl = inputEl as RupiahInputElement;
-    rupiahEl._rupiahOptions = binding.value;
+    
+    // Determine if binding value is the nominal value or options object
+    const bindingVal = binding.value;
+    const hasBinding = bindingVal !== undefined;
+    const isPrimitive = hasBinding && (typeof bindingVal === 'number' || typeof bindingVal === 'string' || bindingVal === null);
+
+    if (hasBinding && !isPrimitive && typeof bindingVal === 'object') {
+      rupiahEl._rupiahOptions = bindingVal;
+    }
 
     // Format initial value if exists after Vue completes mounting
     setTimeout(() => {
-      if (rupiahEl.value) {
-        const formatted = formatRupiah(rupiahEl.value, rupiahEl._rupiahOptions);
+      const initialRaw = isPrimitive ? bindingVal : rupiahEl.value;
+      if (initialRaw !== null && initialRaw !== undefined && initialRaw !== '') {
+        const formatted = formatRupiah(initialRaw, rupiahEl._rupiahOptions);
         if (rupiahEl.value !== formatted) {
           rupiahEl.value = formatted;
           rupiahEl.dispatchEvent(new Event('input', { bubbles: true }));
@@ -72,10 +81,18 @@ export const vRupiah: ObjectDirective<HTMLElement, FormatOptions | undefined> = 
     if (!inputEl) return;
 
     const rupiahEl = inputEl as RupiahInputElement;
-    rupiahEl._rupiahOptions = binding.value;
+    
+    // Determine if binding value is the nominal value or options object
+    const bindingVal = binding.value;
+    const hasBinding = bindingVal !== undefined;
+    const isPrimitive = hasBinding && (typeof bindingVal === 'number' || typeof bindingVal === 'string' || bindingVal === null);
 
-    // Only update if the value has actually changed when parsed
-    const currentParsed = parseRupiah(rupiahEl.value);
+    if (hasBinding && !isPrimitive && typeof bindingVal === 'object') {
+      rupiahEl._rupiahOptions = bindingVal;
+    }
+
+    const rawValue = isPrimitive ? bindingVal : rupiahEl.value;
+    const currentParsed = parseRupiah(rawValue);
 
     // If the binding value changes directly from outside, update the formatted string
     const formatted = formatRupiah(currentParsed, rupiahEl._rupiahOptions);
