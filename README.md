@@ -18,7 +18,6 @@ Vue 3 helper library to easily format numbers/nominals to Indonesian Rupiah and 
 Karena ini merupakan private repository, Anda dapat menginstalnya langsung melalui URL Git:
 
 ```bash
-# Menggunakan HTTPS
 npm install github:mamorasoft/format-rupiah-vue
 ```
 
