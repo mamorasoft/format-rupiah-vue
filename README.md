@@ -141,6 +141,12 @@ console.log(parseRupiah('Rp. 250.000,50')); // 250000.5
 console.log(parseRupiah('100.000')); // 100000
 ```
 
+> [!IMPORTANT]
+> **Penting tentang Konfigurasi Global:**
+> - Jika memanggil di dalam `<script>` komponen Vue, gunakan **`this.$formatRupiah(value)`** atau **`this.$parseRupiah(value)`** agar otomatis mengikuti konfigurasi global (misalnya `Rp `) yang Anda daftarkan di `main.js`.
+> - Jika memanggil di dalam `<template>`, Anda dapat menulis langsung **`{{ $formatRupiah(value) }}`**.
+> - Mengimpor langsung menggunakan **`import { formatRupiah } from 'format-rupiah-vue'`** tidak akan menggunakan konfigurasi global karena fungsi tersebut dieksekusi di luar instance Vue. Dalam kasus tersebut, ia akan selalu menggunakan format bawaan (`Rp. `) kecuali Anda memberikan opsi lokal secara manual, misalnya: `formatRupiah(100000, { prefix: 'Rp ' })`.
+
 ---
 
 ## Configuration Options
